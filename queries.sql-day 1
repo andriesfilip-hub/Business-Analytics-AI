@@ -9,8 +9,8 @@ FROM Customers;
 --2. Churn rate based on gender
 SELECT Gender, 
        COUNT(*) AS Total,
-       SUM(Existed) AS Churned,
-       ROUND(SUM(Existed) * 100.0 / COUNT(*), 2) AS Churn_Rate_Percentage
+       SUM(Exited) AS Churned,
+       ROUND(SUM(Exited) * 100.0 / COUNT(*), 2) AS Churn_Rate_Percentage
 FROM Customers
 GROUP BY Gender;
 
