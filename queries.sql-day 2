@@ -1,0 +1,62 @@
+--EXAMPLE 1
+
+SELECT Geography, 
+       COUNT(CustomerId) AS Total_Clients, 
+       AVG(CreditScore) AS Average_Credit_Score, 
+       MAX(EstimatedSalary) AS Max_Salary
+FROM Customers
+GROUP BY Geography;
+
+--EXERCISE 1
+
+SELECT Gender,
+     COUNT(CustomerId) AS Total_Customers,
+     AVG(Balance) AS Average_Balance
+FROM Customers
+GROUP BY Gender;
+
+--EXERCISE 2
+
+SELECT HasCrCard,
+    COUNT(CustomerId) AS Total_Customers,
+    AVG(Tenure) AS Average_Tenure
+FROM Customers
+GROUP BY HasCrCard 
+
+
+-------------------------
+--EXAMPLE 2
+
+SELECT	
+	CASE
+		WHEN Age <30 THEN 'Young'
+		WHEN Age BETWEEN 30 AND 50 THEN 'Adult'
+		ELSE 'Senior'
+	END AS Age_Category,
+	COUNT(CustomerId) AS Total_Clients
+FROM Customers
+GROUP BY Age_Category;
+
+--EXERCISE 1
+
+SELECT
+	CASE
+		WHEN Balance = 0 THEN 'Empty Balance'
+		WHEN Balance >0 AND BALANCE <=100000 THEN 'Medium Balance'
+		ELSE 'Big Balance'
+	END AS Balance_Category,
+	COUNT(CustomerId) AS Total_Clients
+FROM Customers
+GROUP BY Balance_Category;
+
+--EXERCISE 2
+
+SELECT
+	CASE
+		WHEN Exited = 1 THEN 'Churn'
+		WHEN Exited = 0 THEN 'Remained'
+	END AS Status_Client,
+	COUNT(CustomerId) AS Total_Clients
+FROM Customers
+GROUP BY Status_Client;
+
