@@ -42,7 +42,7 @@ GROUP BY Age_Category;
 SELECT
 	CASE
 		WHEN Balance = 0 THEN 'Empty Balance'
-		WHEN Balance >0 AND BALANCE <=100000 THEN 'Medium Balance'
+		WHEN Balance > 0 AND BALANCE <= 100000 THEN 'Medium Balance'
 		ELSE 'Big Balance'
 	END AS Balance_Category,
 	COUNT(CustomerId) AS Total_Clients
