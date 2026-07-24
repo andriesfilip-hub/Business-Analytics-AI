@@ -1,0 +1,222 @@
+----------------------------EXAMPLE 1
+
+SELECT Surname, Balance
+FROM Customers
+WHERE Balance > (
+    SELECT AVG(Balance) 
+    FROM Customers
+);
+
+--EXERCISE 1
+
+SELECT Surname, CreditScore
+FROM Customers
+WHERE CreditScore > (
+    SELECT AVG(CreditScore)
+    FROM Customers
+);
+
+--EXERCISE 2
+
+SELECT Surname, Geography, EstimatedSalary
+FROM Customers
+WHERE EstimatedSalary = (
+    SELECT MAX(EstimatedSalary)
+    FROM Customers
+); 
+
+----------------------------EXAMPLE 2
+
+SELECT Geography,
+       COUNT(CustomerId) AS Total_Clients,
+       SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS Churned_Clients,
+       (SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(CustomerId)) AS Churn_Rate_Percent
+FROM Customers
+GROUP BY Geography;
+
+--EXERCISE 1
+
+SELECT Geography,
+		COUNT(CustomerId) AS Total_Clients,
+		SUM(CASE WHEN HasCrCard = 1 THEN 1 ELSE 0 END) AS Clients_With_Card,
+		(SUM(CASE WHEN HasCrCard = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(CustomerId)) AS Credit_Card_Adoption_Rate
+FROM Customers
+GROUP BY Geography;
+
+-EXERCISE 2
+
+SELECT Gender,
+		COUNT(CustomerId) AS Total_Clients,
+		SUM(CASE WHEN IsActiveMember = 1 THEN 1 ELSE 0 END) AS Activity_Membership,
+		(SUM(CASE WHEN IsActiveMember = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(CustomerId)) AS Activity_Rate
+FROM Customers
+GROUP BY Gender;
+
+----------------------------EXAMPLE 3
+
+SELECT Geography,
+    ROUND(AVG(Balance), 2) AS Media_Sold
+FROM Customers
+GROUP BY Geography
+ORDER BY Media_Sold DESC;
+
+--EXERCISE 1
+
+SELECT Gender,
+	ROUND(AVG(CreditScore), 2) AS AVG_Credit_Score
+FROM Customers
+GROUP BY Gender
+ORDER BY AVG_Credit_Score DESC;
+
+--EXERCISE 2
+
+SELECT Tenure,
+	ROUND(AVG(EstimatedSalary), 2) AS AVG_Estimated_Salary
+FROM Customers
+GROUP BY Tenure
+ORDER BY AVG_Estimated_Salary DESC;
+
+----------------------------EXAMPLE 4 
+
+SELECT 
+    Geography,
+    ROUND(
+        (SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(CustomerId)), 
+        2
+    ) AS Rate_Churn_Percentage
+FROM Customers
+GROUP BY Geography
+ORDER BY Rate_Churn_Percentage DESC;
+
+--EXERCISE 1 
+
+SELECT Geography,
+	ROUND((SUM(CASE WHEN HasCrCard = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(CustomerId)), 2) AS Adoption_Card_Rate
+FROM Customers
+GROUP BY Geography
+ORDER BY Adoption_Card_Rate DESC;
+
+--EXERCISE 2
+
+SELECT Gender,
+    ROUND(
+        (SUM(CASE WHEN IsActiveMember = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(CustomerId)), 
+        2
+    ) AS Activity_Rate
+FROM Customers
+GROUP BY Gender
+ORDER BY Activity_Rate DESC;
+
+----------------------------EXAMPLE 5
+
+SELECT 
+    Geography,
+    ROUND(AVG(EstimatedSalary), 2) AS AVG_Salary_With_Card
+FROM Customers
+WHERE HasCrCard = 1
+GROUP BY Geography
+ORDER BY AVG_Salary_With_Card DESC;
+
+--EXERCISE 1
+
+SELECT 
+    Geography,
+    ROUND(AVG(EstimatedSalary), 2) AS AVG_Salary_With_Card
+FROM Customers
+WHERE HasCrCard = 1
+GROUP BY Geography
+ORDER BY AVG_Salary_With_Card DESC;
+
+--EXERCISE 2
+
+SELECT GENDER,
+	ROUND(AVG(CreditScore), 2) AS AVG_CrScore_Exited
+FROM Customers
+WHERE Exited = 1
+GROUP BY Gender
+ORDER BY AVG_CrScore_Exited DESC;
+
+----------------------------EXAMPLE 6
+
+SELECT 
+    CASE 
+        WHEN Balance = 0 THEN 'No Balance' 
+        ELSE 'With Balance' 
+    END AS Balance_Category,
+    ROUND(AVG(Age), 1) AS AVG_Age
+FROM Customers
+WHERE Geography = 'France'
+GROUP BY Balance_Category
+ORDER BY AVG_Age DESC;
+
+--EXERCISE 1
+
+SELECT
+	CASE
+		WHEN Age <30 THEN 'Young'
+		ELSE 'Senior'
+	END AS Age_Category_with_Card,
+	ROUND(AVG(CreditScore), 1) AS AVG_Credit_Score
+FROM Customers
+WHERE HasCrCard = 1
+GROUP BY Age_Category_with_Card
+ORDER BY AVG_Credit_Score DESC;
+
+--EXERCISE 2
+
+SELECT
+	CASE
+		WHEN Tenure < 5 THEN 'New Client'
+		ELSE 'Old Client'
+	END AS Client_Category_Active,
+	ROUND(AVG(Balance), 2) AS AVG_Balance
+FROM Customers
+WHERE IsActiveMember = 1
+GROUP BY Client_Category_Active
+ORDER BY AVG_Balance DESC;
+
+----------------------------EXAMPLE 7
+
+SELECT 
+    Surname,
+    EstimatedSalary,
+    ROW_NUMBER() OVER (ORDER BY EstimatedSalary DESC) AS Top_In_Place
+FROM Customers
+WHERE Geography = 'France'
+ORDER BY Top_In_Place ASC;
+
+--EXERCISE 1
+
+SELECT
+	Surname,
+	CreditScore,
+	ROW_NUMBER() OVER (ORDER BY CreditScore DESC) AS Top_CrScore
+FROM Customers
+WHERE Geography = 'Germany'
+ORDER BY Top_CrScore ASC;
+
+--EXERCISE 2
+
+SELECT 
+	Surname,
+	Balance,
+	ROW_NUMBER() OVER (ORDER BY Balance DESC) AS Top_Balance_Exited
+FROM Customers
+WHERE Exited = 1
+ORDER BY Top_Balance_Exited ASC;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
