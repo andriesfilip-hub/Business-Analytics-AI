@@ -1,4 +1,6 @@
-----------------------------EXAMPLE 1
+----------------------------EXAMPLE 1 => Subqueries in WHERE
+
+"Retrieve the surname and balance of all customers whose account balance is higher than the overall average balance of the entire bank."
 
 SELECT Surname, Balance
 FROM Customers
@@ -25,7 +27,9 @@ WHERE EstimatedSalary = (
     FROM Customers
 ); 
 
-----------------------------EXAMPLE 2
+----------------------------EXAMPLE 2 => Advanced Rates & Proportions
+
+"Calculate the churn rate percentage for each country, showing the total number of customers, total churned customers, and the exact churn percentage per region."
 
 SELECT Geography,
        COUNT(CustomerId) AS Total_Clients,
@@ -52,7 +56,9 @@ SELECT Gender,
 FROM Customers
 GROUP BY Gender;
 
-----------------------------EXAMPLE 3
+----------------------------EXAMPLE 3 => Rounding & Sorting (ROUND & ORDER BY)
+
+"Display the average account balance per country, rounded to 2 decimal places, sorted in descending order from highest to lowest average balance."
 
 SELECT Geography,
     ROUND(AVG(Balance), 2) AS Media_Sold
@@ -76,7 +82,9 @@ FROM Customers
 GROUP BY Tenure
 ORDER BY AVG_Estimated_Salary DESC;
 
-----------------------------EXAMPLE 4 
+----------------------------EXAMPLE 4 => Formatted Rates & Percentage Calculations
+
+"Calculate the customer churn rate percentage per country, rounded to 2 decimal places, and rank the countries from highest to lowest churn rate."
 
 SELECT 
     Geography,
@@ -107,7 +115,9 @@ FROM Customers
 GROUP BY Gender
 ORDER BY Activity_Rate DESC;
 
-----------------------------EXAMPLE 5
+----------------------------EXAMPLE 5 => Pre-filtering with Aggregation (WHERE + GROUP BY)
+
+"Calculate the average estimated salary rounded to 2 decimal places, exclusively for credit card holders (HasCrCard = 1), grouped by country and sorted by highest average salary."
 
 SELECT 
     Geography,
@@ -136,7 +146,9 @@ WHERE Exited = 1
 GROUP BY Gender
 ORDER BY AVG_CrScore_Exited DESC;
 
-----------------------------EXAMPLE 6
+----------------------------EXAMPLE 6 => Custom Segmentation & Aggregation
+
+"Segment French customers (Geography = 'France') into balance tiers ('Fara Bani' / 'Zero Balance' if balance is 0, otherwise 'Cu Bani' / 'With Balance') and calculate their average age rounded to 1 decimal place."
 
 SELECT 
     CASE 
@@ -175,7 +187,9 @@ WHERE IsActiveMember = 1
 GROUP BY Client_Category_Active
 ORDER BY AVG_Balance DESC;
 
-----------------------------EXAMPLE 7
+----------------------------EXAMPLE 7 => Global Rankings (Window Functions - ROW_NUMBER)
+
+"Generate a ranked list of all customers in France based on their estimated salary, assigning rank 1 to the highest earner using a window function."
 
 SELECT 
     Surname,
@@ -205,7 +219,9 @@ FROM Customers
 WHERE Exited = 1
 ORDER BY Top_Balance_Exited ASC;
 
-----------------------------EXAMPLE 8 
+----------------------------EXAMPLE 8 => Partitioned Rankings (PARTITION BY)
+
+"Rank all customers within their respective countries based on their account balance, resetting the rank back to 1 for each new country (PARTITION BY Geography)."
 
 SELECT 
     Geography,
