@@ -205,9 +205,44 @@ FROM Customers
 WHERE Exited = 1
 ORDER BY Top_Balance_Exited ASC;
 
+----------------------------EXAMPLE 8 
 
+SELECT 
+    Geography,
+    Surname,
+    Balance,
+    ROW_NUMBER() OVER (
+        PARTITION BY Geography 
+        ORDER BY Balance DESC
+    ) AS Top_Place_In_Country
+FROM Customers
+ORDER BY Geography ASC, Top_Place_In_Country ASC;
 
+--EXERCISE 1
 
+SELECT
+	Gender,
+	Surname,
+	CreditScore,
+	ROW_NUMBER() OVER (
+		PARTITION BY Gender
+		ORDER BY CreditScore DESC
+	) AS Top_Place_for_CrScore_In_Country
+FROM Customers
+ORDER BY Gender ASC, Top_Place_for_CrScore_In_Country ASC;
+
+--EXERCISE 2
+
+SELECT
+	NumOfProducts,
+	Surname,
+	EstimatedSalary,
+	ROW_NUMBER() OVER (
+		PARTITION BY NumOfProducts
+		ORDER BY EstimatedSalary DESC
+	) AS Top_In_Place_For_products
+FROM Customers
+ORDER BY NumOfProducts ASC, Top_In_Place_For_products ASC; 
 
 
 
