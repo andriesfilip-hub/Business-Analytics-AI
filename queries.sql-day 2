@@ -1,4 +1,4 @@
---------------------------------EXAMPLE 1
+--------------------------------EXAMPLE 1 => Data Aggregation (COUNT, AVG, MAX + GROUP BY)
 
 "Provide a regional summary showing the total count of customers, average credit score, and maximum estimated salary grouped by country."
 
@@ -25,7 +25,7 @@ SELECT HasCrCard,
 FROM Customers
 GROUP BY HasCrCard 
 
---------------------------------EXAMPLE 2
+--------------------------------EXAMPLE 2 => Conditional Logic (CASE WHEN)
 
 "Categorize customers into age brackets ('Young' under 30, 'Adult' between 30-50, 'Senior' over 50) and calculate the total number of customers in each bracket."
 
