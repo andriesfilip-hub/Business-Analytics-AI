@@ -1,0 +1,197 @@
+------------------------------EXAMPLE 1 => Handling Ties in Rankings (RANK vs DENSE_RANK)
+
+"Generate a ranking of customers in Spain based on their credit score, 
+handling potential tied values using DENSE_RANK() so that identical scores receive the same position without skipping subsequent ranks."
+
+SELECT 
+    Surname,
+    CreditScore,
+    DENSE_RANK() OVER (ORDER BY CreditScore DESC) AS Rank_Credit_Score
+FROM Customers
+WHERE Geography = 'Spain'
+ORDER BY Rank_Credit_Score ASC;
+
+--EXERCISE 1
+
+SELECT
+	Surname,
+	Tenure,
+	DENSE_RANK() OVER (ORDER BY Tenure DESC) AS Rank_Tenure
+FROM Customers
+WHERE Exited = 1
+ORDER BY Rank_Tenure ASC;
+
+--EXERCISE 2
+
+SELECT
+	Geography,
+	Gender,
+	NumOfProducts,
+	DENSE_RANK() OVER (PARTITION BY Geography ORDER BY NumOfProducts DESC) AS Rank_NumOfProducts_by_Country
+FROM Customers
+WHERE Gender = 'Female'
+ORDER BY Geography ASC, Rank_NumOfProducts_by_Country ASC;
+
+------------------------------EXAMPLE 2 => Organizing Complex Queries using Common Table Expressions/CTE (WITH Clause)
+
+"Calculate the average balance per country in a temporary table (CTE), then filter and display only those countries where the calculated average balance exceeds 70,000."
+
+WITH Country_Avg_Balances AS (
+    SELECT 
+        Geography,
+        ROUND(AVG(Balance), 2) AS Avg_Sold
+    FROM Customers
+    GROUP BY Geography
+)
+SELECT 
+    Geography,
+    Media_Sold
+FROM Country_Avg_Balances
+WHERE Avg_Sold > 70000;
+
+--EXERCISE 1
+
+WITH Gender_Credit_Scores AS (
+	SELECT 
+		Gender,
+		ROUND(AVG(CreditScore), 2) AS Avg_Credit_Score
+	FROM Customers
+	GROUP BY Gender
+)
+SELECT
+	Gender,
+	Avg_Credit_Score
+FROM Gender_Credit_Scores
+WHERE Avg_Credit_Score > 650;
+
+--EXERCISE 2
+
+WITH Top_Salary_Customers AS (
+	SELECT 
+		Surname,
+		EstimatedSalary,
+		ROW_NUMBER() OVER (ORDER BY EstimatedSalary DESC) AS Salary_Rank
+	FROM Customers
+)
+SELECT
+	Surname,
+	EstimatedSalary,
+	Salary_Rank
+FROM Top_Salary_Customers
+WHERE Salary_Rank <= 5;
+
+------------------------------EXAMPLE 3 => Filtering Window Functions using CTEs (Top N per Category)
+
+"Find the top 2 highest-earning customers from each country (Geography) using a CTE and a window function (ROW_NUMBER())."
+
+WITH Ranked_Salaries_By_Country AS (
+    SELECT 
+        Geography,
+        Surname,
+        EstimatedSalary,
+        ROW_NUMBER() OVER (
+            PARTITION BY Geography 
+            ORDER BY EstimatedSalary DESC
+        ) AS Country_Salary_Rank
+    FROM Customers
+)
+SELECT 
+    Geography,
+    Surname,
+    EstimatedSalary,
+    Country_Salary_Rank
+FROM Ranked_Salaries_By_Country
+WHERE Country_Salary_Rank <= 2
+ORDER BY Geography ASC, Country_Salary_Rank ASC;
+
+--EXERCISE 1
+
+WITH Ranked_Balances_By_Gender AS (
+	SELECT 
+		Gender,
+		Surname,
+		Balance,
+		ROW_NUMBER() OVER (
+		PARTITION BY Gender ORDER BY Balance DESC
+		) AS Gender_Balance_Rank
+		FROM Customers
+)
+SELECT
+	Gender,
+	Surname,
+	Balance,
+	Gender_Balance_Rank
+FROM Ranked_Balances_By_Gender
+WHERE Gender_Balance_Rank <= 3
+ORDER BY Gender ASC, Gender_Balance_Rank ASC;
+
+--EXERCISE 2
+
+WITH Ranked_Credit_Scores_By_Products AS (
+	SELECT 
+		Surname, 
+		NumOfProducts,
+		CreditScore,
+		ROW_NUMBER() OVER (
+		PARTITION BY NumOfProducts ORDER BY CreditScore DESC
+		) AS Product_Score_Rank
+		FROM Customers
+)
+SELECT
+	Surname,
+	NumOfProducts,
+	CreditScore,
+	Product_Score_Rank
+FROM Ranked_Credit_Scores_By_Products
+WHERE Product_Score_Rank = 1
+ORDER BY NumOfProducts ASC, Product_Score_Rank ASC;
+
+------------------------------EXAMPLE 4 => Analytical Aggregations with Window Functions (LAG and LEAD)
+
+"Display a list of customers ordered by their estimated salary, showing each customer's surname, estimated salary, 
+and the salary of the customer directly preceding them in the ranking (Previous_Salary)."
+
+SELECT 
+    Surname,
+    EstimatedSalary,
+    LAG(EstimatedSalary) OVER (ORDER BY EstimatedSalary DESC) AS Previous_Salary
+FROM Customers
+ORDER BY EstimatedSalary DESC;
+
+--EXERCISE 1
+
+SELECT
+	Geography,
+	Surname,
+	CreditScore,
+	LEAD(CreditScore) OVER (ORDER BY CreditScore DESC) AS Next_Credit_Score
+FROM Customers
+WHERE Geography = 'Germany'
+ORDER BY CreditScore DESC;
+
+--EXERCISE 2
+
+WITH Salary_Differences AS (
+	SELECT
+		Surname,
+		EstimatedSalary,
+		LAG(EstimatedSalary) OVER (ORDER BY EstimatedSalary DESC) AS Previous_Salary
+		FROM Customers
+		WHERE Gender = 'Male'
+)
+SELECT
+	Surname,
+	EstimatedSalary,
+	Previous_Salary,
+	(EstimatedSalary - Previous_Salary) AS Salary_Gap
+FROM Salary_Differences
+ORDER BY EstimatedSalary DESC;
+
+
+
+
+
+
+
+
+
