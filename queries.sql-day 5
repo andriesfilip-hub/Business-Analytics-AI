@@ -1,0 +1,170 @@
+---------------------------------------EXAMPLE 1 => Conditional Aggregations inside CTEs (CASE WHEN + CTE)
+
+"Create a CTE named Country_Customer_Types that counts total customers and churned customers (Exited = 1) per country. 
+In the main query, calculate the retention rate percentage (Retention_Rate = 100.0 - Churn_Rate)."
+
+WITH Country_Customer_Types AS (
+    SELECT 
+        Geography,
+        COUNT(CustomerId) AS Total_Customers,
+        SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS Churned_Customers
+    FROM Customers
+    GROUP BY Geography
+)
+SELECT 
+    Geography,
+    Total_Customers,
+    Churned_Customers,
+    ROUND(100.0 - (Churned_Customers * 100.0 / Total_Customers), 2) AS Retention_Rate
+FROM Country_Customer_Types
+ORDER BY Retention_Rate DESC;
+
+--EXERCISE 1
+
+"Create a CTE named Gender_Card_Stats that calculates the total number of customers and the number of credit card holders (HasCrCard = 1) for each gender. 
+In the main query, calculate the credit card adoption rate percentage (Card_Adoption_Rate)."
+
+WITH Gender_Card_Stats AS (
+	SELECT
+		Gender,
+		COUNT(CustomerId) as Total_Customers,
+		SUM(CASE WHEN HasCrCard = 1 THEN 1 ELSE 0 END) AS Cr_Card_Holder
+	FROM Customers
+	GROUP BY Gender
+)
+SELECT
+	Gender,
+	Total_Customers,
+	Cr_Card_Holder,
+	ROUND((Cr_Card_Holder * 100.0 / Total_Customers), 2) AS Card_Adoption_Rate
+FROM Gender_Card_Stats
+ORDER BY Card_Adoption_Rate DESC;
+
+--EXERCISE 2
+
+"Create a CTE named Active_Members_By_Tenure that calculates the total customers and total active members (IsActiveMember = 1) grouped by tenure (Tenure). 
+In the main query, calculate the activity rate percentage (Activity_Rate) and display only tenures with an activity rate greater than 50%."
+
+WITH Active_Members_By_Tenure AS (
+	SELECT
+		Tenure,
+		COUNT(CustomerId) AS Total_Customers,
+		SUM(CASE WHEN IsActiveMember = 1 THEN 1 ELSE 0 END) AS Total_Active_Members
+	FROM Customers
+	GROUP BY Tenure
+)
+SELECT
+	Tenure,
+	Total_Customers,
+	Total_Active_Members,
+	ROUND((Total_Active_Members * 100.0 / Total_Customers), 2) AS Activity_Rate
+FROM Active_Members_By_Tenure
+WHERE Activity_Rate > 50
+ORDER BY Activity_Rate DESC;
+
+---------------------------------------EXAMPLE 2 => Multi-Level CTEs (Chaining Multiple CTEs)
+
+"Build a multi-level CTE query: 
+First, calculate the average balance and total customer count per country in Country_Summary. 
+Second, filter (>>WHERE<<) only regions with more than 2,400 customers in Major_Markets. 
+Finally, select the country name, total customers, and average balance from Major_Markets sorted by average balance descending."
+
+WITH Country_Summary AS (
+    SELECT 
+        Geography,
+        COUNT(CustomerId) AS Total_Customers,
+        ROUND(AVG(Balance), 2) AS Avg_Balance
+    FROM Customers
+    GROUP BY Geography
+),
+Major_Markets AS (
+    SELECT 
+        Geography,
+        Total_Customers,
+        Avg_Balance
+    FROM Country_Summary
+    WHERE Total_Customers > 2400
+)
+SELECT 
+    Geography,
+    Total_Customers,
+    Avg_Balance
+FROM Major_Markets
+ORDER BY Avg_Balance DESC;
+
+--EXERCISE 1
+
+"Build a multi-level CTE query: 
+First, calculate total customers and total churned customers (Exited = 1) per tenure group in Tenure_Stats. 
+Second, calculate the exact churn rate percentage (Churn_Rate) in Tenure_Churn_Rates. 
+Finally, select the tenure, total customers, and churn rate from Tenure_Churn_Rates for groups where Churn_Rate > 20% sorted by churn rate descending."
+
+WITH Tenure_Stats AS (
+	SELECT
+		Tenure,
+		COUNT(CustomerId) AS Total_Customers,
+		SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS Churned_Customers
+	FROM Customers
+	GROUP BY Tenure
+),
+Tenure_Churn_Rates AS (
+	SELECT
+		Tenure,
+		Total_Customers,
+		ROUND((Churned_Customers * 100.0 / Total_Customers), 2) AS Churn_Rate
+	FROM Tenure_Stats
+)
+SELECT
+	Tenure,
+	Total_Customers,
+	Churn_Rate
+FROM Tenure_Churn_Rates
+WHERE Churn_Rate > 20
+ORDER BY Churn_Rate DESC;
+
+--EXERCISE 2
+
+"Build a multi-level CTE query: 
+First, rank all female customers (Gender = 'Female') in each country by estimated salary in Female_Salary_Ranks using ROW_NUMBER(). 
+Second, filter only the top 3 earners per country in Top_3_Female_Earners. 
+Finally, select all columns from Top_3_Female_Earners sorted by country and salary rank."
+
+WITH Female_Salary_Ranks AS (
+	SELECT
+		Geography,
+		Surname,
+		EstimatedSalary,
+	ROW_NUMBER() OVER (
+	PARTITION BY Geography 
+	ORDER BY EstimatedSalary DESC
+	) AS Salary_Rank
+	FROM Customers
+	WHERE Gender = 'Female' 
+),
+Top_3_Female_Earners AS ( 
+	SELECT
+		Geography,
+		Surname,
+		EstimatedSalary,
+		Salary_Rank
+	FROM Female_Salary_Ranks
+	WHERE Salary_Rank <= 3
+)
+SELECT
+	Geography,
+	Surname,
+	EstimatedSalary,
+	Salary_Rank
+FROM Top_3_Female_Earners
+ORDER BY Geography ASC, Salary_Rank ASC;
+
+
+
+
+
+
+
+
+
+
+
